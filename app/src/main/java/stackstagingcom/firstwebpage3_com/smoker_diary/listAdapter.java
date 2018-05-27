@@ -44,8 +44,8 @@ public class listAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
 
-        LayoutInflater layoutInflater = getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.items,null);
+        //LayoutInflater layoutInflater = getLayoutInflater();
+        //View view = layoutInflater.inflate(R.layout.items,null);
 
 
         TextView num_cig = (TextView)view.findViewById(R.id.txtCig);

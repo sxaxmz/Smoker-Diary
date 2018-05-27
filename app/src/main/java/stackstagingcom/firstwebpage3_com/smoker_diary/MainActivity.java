@@ -1,5 +1,6 @@
 package stackstagingcom.firstwebpage3_com.smoker_diary;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     TextView smokedQty;
     TextView smokedSince;
     TextView smokedAverage;
+    TextView txtCost;
     ListView smoked;
     int numberOfCig;
     int previousCig;
@@ -45,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showListView();
+                /**Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();**/
             }
         });
 
@@ -55,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
         smokedAverage = (TextView)findViewById(R.id.average);
-
-        smokedQty.setText(String.valueOf(numberOfCig));
+        txtCost = (TextView)findViewById(R.id.txtCost);
 
 
         btnAddSmoked.setOnClickListener(new View.OnClickListener () {
@@ -118,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
             double average = numOfCig / 24;
             smokedAverage.setText(String.valueOf(average));
         }
+    }
+
+    public void showListView () {
+        Intent intent = new Intent(this, lis_view.class);
+        intent.putExtra("numOfCig", numberOfCig);
+        startActivity(intent);
     }
 
 

@@ -3,6 +3,7 @@
 #ToDo: 
 i)elapsedRealTime
 ii)Local Storage
-iii)Intent
+iii)Intent (CigSmoked, Date,Cost)
+iv)ArrayList (CigSmoked, Date,Cost)
 
 **To Be Updated **
