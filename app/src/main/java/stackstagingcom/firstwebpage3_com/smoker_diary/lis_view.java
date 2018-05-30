@@ -23,10 +23,10 @@ public class lis_view extends AppCompatActivity  {
         setContentView(R.layout.list_view);
 
         smokedList = (ListView)findViewById(R.id.listSmoked);
-        TextView txtView = (TextView)findViewById(R.id.txtView) ;
 
         Intent intent = getIntent();
         String numOfCig = intent.getStringExtra("numOfCig");
+        String cigTime = intent.getStringExtra("timeStamp");
 
 
     }

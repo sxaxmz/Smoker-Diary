@@ -1,9 +1,8 @@
 # Smoker-Diary
 
 #ToDo: 
-i)elapsedRealTime
-ii)Local Storage
-iii)Intent (CigSmoked, Date,Cost)
-iv)ArrayList (CigSmoked, Date,Cost)
+i)Local Storage -Modifications-
+ii)ArrayList (CigSmoked, Date,Cost)
+iii) Custom Toolbar
 
 **To Be Updated **

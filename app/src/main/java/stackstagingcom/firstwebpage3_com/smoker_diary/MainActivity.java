@@ -15,28 +15,51 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.security.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    //SharedPreference references
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String TEXT = "text";
+    public static final String Average = "average";
+    public static final String lastSmoked = "lastSmoked";
+
+    //LoadData variables
+    private String textt;
+    private String timeStamp;
+    private String AverageSmoked;
+
+    //UI components
     Button btnAddSmoked;
     TextView smokedQty;
     TextView smokedSince;
     TextView smokedAverage;
-    TextView txtCost;
     ListView smoked;
+
+    //Variables
+    int average;
     int numberOfCig;
     int previousCig;
     int days = 0;
+
+    String cigTime;
+
     Date startDateValue = new Date();
+    Date endDateValue = new Date();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 
 
@@ -57,47 +80,25 @@ public class MainActivity extends AppCompatActivity {
         smokedQty = (TextView)findViewById(R.id.qty1);
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
-        smokedAverage = (TextView)findViewById(R.id.average);
-        txtCost = (TextView)findViewById(R.id.txtCost);
+        smokedAverage = (TextView)findViewById(R.id.smokedAverage);
 
 
         btnAddSmoked.setOnClickListener(new View.OnClickListener () {
             @Override
             public void onClick(View view) {
                 addSmoked();
+
             }
         });
 
+        loadData();
+        updateView();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-        return super.onOptionsItemSelected(item);
-    }
 
-    public void timeDifference() {
-        long Time = SystemClock.elapsedRealtime();
-        long difference = SystemClock.elapsedRealtime() - Time;
-
-        smokedSince.setText(String.valueOf(difference));
-    }
 
     public void addSmoked () {
         numberOfCig = 1 + numberOfCig;
@@ -106,27 +107,111 @@ public class MainActivity extends AppCompatActivity {
 
         if (numberOfCig == 0) {
             smokedSince.setText("0 minutes");
-        } else if (previousCig > numberOfCig){
-            timeDifference();
         }
 
         previousCig = numberOfCig;
+
+        Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show();
+
+        saveData();
+        lastCig();
     }
 
     public void calcAverage (int numOfCig) {
         if (days == 0) {
             smokedAverage.setText(String.valueOf(numOfCig));
+            average = Integer.parseInt(smokedAverage.getText().toString());
         } else {
-            double average = numOfCig / 24;
+            //lifetime average cigarette
+            average = numOfCig / days;
             smokedAverage.setText(String.valueOf(average));
         }
     }
 
     public void showListView () {
-        Intent intent = new Intent(this, lis_view.class);
-        intent.putExtra("numOfCig", numberOfCig);
-        startActivity(intent);
+        Intent listView = new Intent(this, lis_view.class);
+        listView.putExtra("numOfCig", numberOfCig);
+        listView.putExtra("timeStamp", cigTime);
+        startActivity(listView);
     }
 
+    public void saveData () {
+        SharedPreferences sp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.putString(TEXT, Integer.toString(numberOfCig));
+        editor.putString(Average, String.valueOf(average));
+        editor.putString(lastSmoked, smokedSince.getText().toString());
+
+        editor.apply();
+
+    }
+
+    public void loadData () {
+        SharedPreferences sp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        textt = sp.getString(TEXT, "0");
+        AverageSmoked = sp.getString(Average, "0");
+        timeStamp = sp.getString(lastSmoked, "-D -H -M -S");
+        numberOfCig = Integer.parseInt(textt);
+    }
+
+    public void updateView (){
+        smokedQty.setText(textt);
+        smokedSince.setText(timeStamp);
+        smokedAverage.setText(AverageSmoked);
+    }
+
+    public void lastCig () {
+        startDateValue.getTime();
+        endDateValue.setTime(1527672629000L);
+
+        printDifference(startDateValue, endDateValue);
+
+        endDateValue = startDateValue;
+
+    }
+
+
+    public void printDifference(Date startDate, Date endDate){
+
+        //milliseconds
+        long different = endDate.getTime() - startDate.getTime();
+
+
+        //1 minute = 60 seconds
+        //1 hour = 60 x 60 = 3600
+        //1 day = 3600 x 24 = 86400
+
+        long secondsInMilli = 1000;
+        long minutesInMilli = secondsInMilli * 60;
+        long hoursInMilli = minutesInMilli * 60;
+        long daysInMilli = hoursInMilli * 24;
+
+        long elapsedDays = different / daysInMilli;
+        different = different % daysInMilli;
+
+        long elapsedHours = different / hoursInMilli;
+        different = different % hoursInMilli;
+
+        long elapsedMinutes = different / minutesInMilli;
+        different = different % minutesInMilli;
+
+        long elapsedSeconds = different / secondsInMilli;
+
+        smokedSince.setText(
+                Long.toString(Math.abs(elapsedDays)) +" D " + Long.toString(Math.abs(elapsedHours)) + " H " +
+                        Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S "
+        );
+
+        cigTime = Long.toString(Math.abs(elapsedHours)) + " : " + Long.toString(Math.abs(elapsedMinutes));
+
+
+
+        System.out.printf(
+                "%d days, %d hours, %d minutes, %d seconds%n",
+                elapsedDays,
+                elapsedHours, elapsedMinutes, elapsedSeconds);
+
+    }
 
 }
