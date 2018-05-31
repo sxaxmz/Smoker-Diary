@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
     TextView smokedQty;
     TextView smokedSince;
     TextView smokedAverage;
-    ListView smoked;
 
     //Variables
     int average;
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        smoked = (ListView)findViewById(R.id.listSmoked);
         smokedQty = (TextView)findViewById(R.id.qty1);
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
@@ -130,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void showListView () {
         Intent listView = new Intent(this, lis_view.class);
-        listView.putExtra("numOfCig", numberOfCig);
-        listView.putExtra("timeStamp", cigTime);
+        listView.putExtra("numOfCig", String.valueOf(numberOfCig));
+        listView.putExtra("timeStamp", String.valueOf(cigTime));
         startActivity(listView);
     }
 
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
 
-        editor.putString(TEXT, Integer.toString(numberOfCig));
+        editor.putString(TEXT, String.valueOf(numberOfCig));
         editor.putString(Average, String.valueOf(average));
         editor.putString(lastSmoked, smokedSince.getText().toString());
 
@@ -203,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                         Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S "
         );
 
+        //need modification
         cigTime = Long.toString(Math.abs(elapsedHours)) + " : " + Long.toString(Math.abs(elapsedMinutes));
 
 

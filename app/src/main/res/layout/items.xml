@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/txtCig"
-        android:layout_width="191dp"
-        android:layout_height="wrap_content"
-        android:text="num_cig" />
 
-    <TextView
-        android:id="@+id/txtTimeStamp"
-        android:layout_width="191dp"
-        android:layout_height="wrap_content"
-        android:text="TimeStamp" />
 
-</LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/txtCig"
+            android:layout_width="191dp"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:text="num_cig"
+            android:textAllCaps="false"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txtTimeStamp"
+            android:layout_width="191dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtCig"
+            android:fontFamily="monospace"
+            android:text="TimeStamp"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
