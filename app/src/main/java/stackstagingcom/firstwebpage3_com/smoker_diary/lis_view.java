@@ -3,10 +3,12 @@ package stackstagingcom.firstwebpage3_com.smoker_diary;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -18,6 +20,8 @@ import java.util.ArrayList;
  */
 
 public class lis_view extends AppCompatActivity  {
+
+    public static final String TAG = "list_view";
 
     //SharedPreference references
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -35,35 +39,46 @@ public class lis_view extends AppCompatActivity  {
     private RecyclerView.Adapter myRVA;
     private RecyclerView.LayoutManager myRVLM;
 
+    DatabaseHelper myDB;
+
     String numOfCig;
     String cigTime;
 
     TextView smokedQty;
     TextView smokedSince;
+    ArrayList<items> itemsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_view);
 
+        /**
         Intent intent = getIntent();
         numOfCig = intent.getStringExtra("numOfCig");
         cigTime = intent.getStringExtra("timeStamp");
+         **/
 
-        ArrayList<items> itemsList = new ArrayList<>();
+        myDB = new DatabaseHelper(this);
+
+        itemsList = new ArrayList<>();
+
+        myRV = findViewById(R.id.RV);
+
+        /**
         //adding the values in the ArrayList
         itemsList.add(new items(numOfCig, cigTime));
 
-        myRV = findViewById(R.id.RV);
         myRV.setHasFixedSize(true);
         myRVLM = new LinearLayoutManager(this);
         myRVA = new myRVA(itemsList);
 
         myRV.setLayoutManager(myRVLM);
         myRV.setAdapter(myRVA);
+         **/
 
 
-
+        fillListView();
 
     }
 
@@ -74,8 +89,31 @@ public class lis_view extends AppCompatActivity  {
     }
 
     public void updateView (){
-        smokedQty.setText(textt);
-        smokedSince.setText(timeStamp);
+        numOfCig = textt;
+        cigTime = timeStamp;
+        smokedQty.setText(numOfCig);
+        smokedSince.setText(cigTime);
+    }
+
+    public void fillListView (){
+        Log.d(TAG, "populateListView: Displaying data in the ListView");
+
+        // get data
+        Cursor data = myDB.getData();
+
+        // append data
+        while (data.moveToNext()){
+            //get value from db in column 1 (numOfCig) , column 2 (timeStamp)
+            //add it to arrayList
+            itemsList.add(new items (data.getString(0), data.getString(1)));
+        }
+
+        myRV.setHasFixedSize(true);
+        myRVLM = new LinearLayoutManager(this);
+        myRVA = new myRVA(itemsList);
+
+        myRV.setLayoutManager(myRVLM);
+        myRV.setAdapter(myRVA);
     }
 
 

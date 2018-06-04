@@ -1,8 +1,9 @@
 # Smoker-Diary
 
 #ToDo: 
-i)Local Storage  -> issue double click to store the new (first clcik data) -Modifications-
-ii)ArrayList (CigSmoked, Date) -> retrieve data from local storage isntead of intent
-iii) Custom Toolbar
+i)ArrayList (CigSmoked, Date) -> CardView design, divided by days
+ii)Custom Toolbar
+iii)Algo for getting days
+iv)Adjust timestamp for arrayList
 
 **To Be Updated **

@@ -2,6 +2,7 @@ package stackstagingcom.firstwebpage3_com.smoker_diary;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -25,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper myDB;
 
     //SharedPreference references
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -59,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
+        myDB = new DatabaseHelper(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 addSmoked();
-
+                addData(Integer.toString(numberOfCig), cigTime);
             }
         });
 
@@ -93,10 +95,15 @@ public class MainActivity extends AppCompatActivity {
         updateView();
     }
 
+    public void addData (String newCig, String timeStamp){
+        boolean insertData = myDB.addData(newCig, timeStamp);
 
-
-
-
+        if (insertData){
+            Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Something went wrong",Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public void addSmoked () {
         numberOfCig = 1 + numberOfCig;
@@ -113,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         saveData();
         lastCig();
+
     }
 
     public void calcAverage (int numOfCig) {
