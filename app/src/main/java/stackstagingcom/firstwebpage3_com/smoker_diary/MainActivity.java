@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
         printDifference(startDateValue, endDateValue);
 
-        endDateValue = startDateValue;
+        //endDateValue = startDateValue;
 
     }
 
@@ -210,7 +211,13 @@ public class MainActivity extends AppCompatActivity {
         );
 
         //need modification
-        cigTime = Long.toString(Math.abs(elapsedHours)) + " : " + Long.toString(Math.abs(elapsedMinutes));
+        //cigTime = Long.toString(Math.abs(elapsedHours)) + " : " + Long.toString(Math.abs(elapsedMinutes));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        sdf.setTimeZone(TimeZone.getDefault());
+        cigTime = sdf.format(startDate);
+
+        endDateValue = startDate;
 
 
 

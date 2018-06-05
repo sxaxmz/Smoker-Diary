@@ -1,9 +1,8 @@
-# Smoker-Diary
+                                                                      # Smoker-Diary
 
 #ToDo: 
-i)ArrayList (CigSmoked, Date) -> CardView design, divided by days
+i)ArrayList -> CardView design, divided by days/date
 ii)Custom Toolbar
-iii)Algo for getting days
-iv)Adjust timestamp for arrayList
+iii)Algo for counting days/date
 
-**To Be Updated **
+                                                                      **To Be Updated **
