@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,11 +37,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String TEXT = "text";
     public static final String Average = "average";
     public static final String lastSmoked = "lastSmoked";
+    public static final String cigFirst = "firstCig";
+    public static final String lastSmokedCig = "lastSmokedCigLong";
 
     //LoadData variables
     private String textt;
     private String timeStamp;
     private String AverageSmoked;
+    private String firsttCig;
+    private String lastSmokedCigg;
 
     //UI components
     Button btnAddSmoked;
@@ -50,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     //Variables
     int average;
     int numberOfCig;
+    int firstCig;
     int previousCig;
     int days = 0;
 
@@ -58,10 +65,15 @@ public class MainActivity extends AppCompatActivity {
     Date startDateValue = new Date();
     Date endDateValue = new Date();
 
+    long startDateValueLong;
+    long lastSmokedCigLong;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         myDB = new DatabaseHelper(this);
 
@@ -82,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
         smokedAverage = (TextView)findViewById(R.id.smokedAverage);
+
 
 
         btnAddSmoked.setOnClickListener(new View.OnClickListener () {
@@ -149,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(TEXT, String.valueOf(numberOfCig));
         editor.putString(Average, String.valueOf(average));
         editor.putString(lastSmoked, smokedSince.getText().toString());
+        editor.putString(cigFirst, Integer.toString(firstCig));
+        editor.putString(lastSmokedCig, Long.toString(lastSmokedCigLong));
 
         editor.apply();
 
@@ -159,7 +174,11 @@ public class MainActivity extends AppCompatActivity {
         textt = sp.getString(TEXT, "0");
         AverageSmoked = sp.getString(Average, "0");
         timeStamp = sp.getString(lastSmoked, "-D -H -M -S");
+        firsttCig = sp.getString(cigFirst , "0");
+        lastSmokedCigg = sp.getString(lastSmokedCig, "0");
         numberOfCig = Integer.parseInt(textt);
+        firstCig = Integer.parseInt(firsttCig);
+        lastSmokedCigLong = Long.parseLong(lastSmokedCigg);
     }
 
     public void updateView (){
@@ -169,20 +188,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void lastCig () {
-        startDateValue.getTime();
-        endDateValue.setTime(1527672629000L);
+        //endDateValue.setTime(1527672629000L); //test purpose
+
+
+        //startDateValue is the date of the recent cig
+        //endDateValue is the value of the last cig
+
+
+        startDateValueLong = startDateValue.getTime();
+        startDateValue.setTime(startDateValueLong);
+
+        System.out.print(" firstCig: "+firstCig);
+
+
+        //firstCig is the very first cig in the app,
+        //used to calc/define lastCig time
+        if (firstCig == 0) {
+            endDateValue.setTime(0);
+            firstCig = 1;
+        } else if (firstCig == 1){
+            endDateValue.setTime(lastSmokedCigLong);
+        }
 
         printDifference(startDateValue, endDateValue);
 
-        //endDateValue = startDateValue;
-
-    }
+           }
 
 
     public void printDifference(Date startDate, Date endDate){
 
         //milliseconds
-        long different = endDate.getTime() - startDate.getTime();
+        long different;
+        different = endDate.getTime() - startDate.getTime(); //modify
+
 
 
         //1 minute = 60 seconds
@@ -210,15 +248,17 @@ public class MainActivity extends AppCompatActivity {
                         Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S "
         );
 
-        //need modification
+        System.out.print("start: "+ startDate);
+        System.out.print(" end: "+ endDate);
+
+        lastSmokedCigLong = startDate.getTime();
+
+        //Modification
         //cigTime = Long.toString(Math.abs(elapsedHours)) + " : " + Long.toString(Math.abs(elapsedMinutes));
 
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         sdf.setTimeZone(TimeZone.getDefault());
         cigTime = sdf.format(startDate);
-
-        endDateValue = startDate;
-
 
 
         System.out.printf(
