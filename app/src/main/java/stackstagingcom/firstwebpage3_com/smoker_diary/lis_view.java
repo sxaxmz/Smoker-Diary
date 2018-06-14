@@ -23,28 +23,12 @@ public class lis_view extends AppCompatActivity  {
 
     public static final String TAG = "list_view";
 
-    //SharedPreference references
-    public static final String SHARED_PREFS = "sharedPrefs";
-    public static final String TEXT = "text";
-    public static final String Average = "average";
-    public static final String lastSmoked = "lastSmoked";
-
-    //LoadData variables
-    private String textt;
-    private String timeStamp;
-    private String AverageSmoked;
-
-
     private RecyclerView myRV;
     private RecyclerView.Adapter myRVA;
     private RecyclerView.LayoutManager myRVLM;
 
     DatabaseHelper myDB;
 
-    String numOfCig;
-    String cigTime;
-
-    TextView smokedQty;
     TextView smokedSince;
     ArrayList<items> itemsList;
 
@@ -53,11 +37,6 @@ public class lis_view extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_view);
 
-        /**
-        Intent intent = getIntent();
-        numOfCig = intent.getStringExtra("numOfCig");
-        cigTime = intent.getStringExtra("timeStamp");
-         **/
 
         myDB = new DatabaseHelper(this);
 
@@ -80,19 +59,6 @@ public class lis_view extends AppCompatActivity  {
 
         fillListView();
 
-    }
-
-    public void loadData () {
-        SharedPreferences sp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        textt = sp.getString(TEXT, "0");
-        timeStamp = sp.getString(lastSmoked, "-D -H -M -S");
-    }
-
-    public void updateView (){
-        numOfCig = textt;
-        cigTime = timeStamp;
-        smokedQty.setText(numOfCig);
-        smokedSince.setText(cigTime);
     }
 
     public void fillListView (){

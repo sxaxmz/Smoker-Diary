@@ -2,31 +2,20 @@ package stackstagingcom.firstwebpage3_com.smoker_diary;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.security.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String lastSmoked = "lastSmoked";
     public static final String cigFirst = "firstCig";
     public static final String lastSmokedCig = "lastSmokedCigLong";
+    public static final String dayz = "days";
 
     //LoadData variables
     private String textt;
@@ -46,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private String AverageSmoked;
     private String firsttCig;
     private String lastSmokedCigg;
+    private String day;
 
     //UI components
     Button btnAddSmoked;
@@ -58,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
     int numberOfCig;
     int firstCig;
     int previousCig;
-    int days = 0;
+    public static int days = 0;
 
     String cigTime;
+    String dayDate;
 
     Date startDateValue = new Date();
     Date endDateValue = new Date();
@@ -68,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     long startDateValueLong;
     long lastSmokedCigLong;
 
+
+    SimpleDateFormat date = new SimpleDateFormat("MMM/dd/yy");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
         updateView();
     }
 
+    protected void onResume () {
+        super.onResume();
+        lastCig();
+    }
+
+
     public void addData (String newCig, String timeStamp){
         boolean insertData = myDB.addData(newCig, timeStamp);
 
@@ -135,6 +135,20 @@ public class MainActivity extends AppCompatActivity {
         saveData();
         lastCig();
 
+        Date day = null;
+        try {
+            day = date.parse(dayDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        boolean insertData = myDB.addDate(day.getTime());
+
+        if (insertData){
+            Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Something went wrong /date/",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     public void calcAverage (int numOfCig) {
@@ -150,8 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void showListView () {
         Intent listView = new Intent(this, lis_view.class);
-        listView.putExtra("numOfCig", String.valueOf(numberOfCig));
-        listView.putExtra("timeStamp", String.valueOf(cigTime));
         startActivity(listView);
     }
 
@@ -164,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(lastSmoked, smokedSince.getText().toString());
         editor.putString(cigFirst, Integer.toString(firstCig));
         editor.putString(lastSmokedCig, Long.toString(lastSmokedCigLong));
+        editor.putString(dayz, Integer.toString(days));
 
         editor.apply();
 
@@ -176,9 +189,12 @@ public class MainActivity extends AppCompatActivity {
         timeStamp = sp.getString(lastSmoked, "-D -H -M -S");
         firsttCig = sp.getString(cigFirst , "0");
         lastSmokedCigg = sp.getString(lastSmokedCig, "0");
+        day = sp.getString(dayz, "0");
+
         numberOfCig = Integer.parseInt(textt);
         firstCig = Integer.parseInt(firsttCig);
         lastSmokedCigLong = Long.parseLong(lastSmokedCigg);
+        days = Integer.parseInt(day);
     }
 
     public void updateView (){
@@ -210,9 +226,8 @@ public class MainActivity extends AppCompatActivity {
             endDateValue.setTime(lastSmokedCigLong);
         }
 
-        printDifference(startDateValue, endDateValue);
-
-           }
+            printDifference(startDateValue, endDateValue);
+    }
 
 
     public void printDifference(Date startDate, Date endDate){
@@ -259,6 +274,11 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         sdf.setTimeZone(TimeZone.getDefault());
         cigTime = sdf.format(startDate);
+
+
+
+        date.setTimeZone(TimeZone.getDefault());
+        dayDate = date.format(startDate);
 
 
         System.out.printf(

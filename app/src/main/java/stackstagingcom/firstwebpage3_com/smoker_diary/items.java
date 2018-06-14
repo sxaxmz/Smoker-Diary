@@ -14,6 +14,7 @@ public class items {
         this.timeStamp = timeStamp;
     }
 
+
     public String getNumOfCig (){
         return num_of_cig;
     }
@@ -21,4 +22,5 @@ public class items {
     public String getTimeStamp (){
         return timeStamp;
     }
+
 }

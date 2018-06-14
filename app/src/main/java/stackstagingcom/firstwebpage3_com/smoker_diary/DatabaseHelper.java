@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import java.util.Date;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -15,6 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL1 = "ID";
     public static final String COL2 = "numOfCig";
     public static final String COL3 = "timeStamp";
+    public static final String COL4 = "dayDate";
 
     public DatabaseHelper(Context context) {
         super(context, tableName, null, 1);
@@ -23,12 +25,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String createTable = "CREATE TABLE " + tableName + "("+COL1+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                COL2 +" VARCHAR, "+COL3+" VARCHAR)";
+                COL2 +" VARCHAR, "+COL3+" VARCHAR, "+COL4+" VARCHAR)";
         sqLiteDatabase.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ tableName);
+        onCreate(sqLiteDatabase);
     }
 
     public boolean addData (String numOfCig, String timeStamp){
@@ -55,4 +59,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor data = db.rawQuery(query, null);
         return  data;
     }
+
+    public boolean addDate (long date) {
+        SQLiteDatabase db =  this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COL4, date);
+
+        Log.d(TAG, " addData: Adding date to "+ tableName);
+
+        Long result = db.insert(tableName, null, cv);
+
+        //-1 data inserted incorrectly
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public Cursor getDate (){
+        SQLiteDatabase db =  this.getWritableDatabase();
+        String query = "SELECT "+COL2+ " FROM "+tableName;
+        Cursor data = db.rawQuery(query, null);
+        return  data;
+    }
+
+    public Cursor getDateList (){
+        SQLiteDatabase db =  this.getWritableDatabase();
+        String query = "SELECT "+COL2+ ", "+COL4+" FROM "+tableName;
+        Cursor data = db.rawQuery(query, null);
+        return  data;
+    }
+
 }
