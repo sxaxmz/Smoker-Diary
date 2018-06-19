@@ -71,7 +71,7 @@ public class lis_view extends AppCompatActivity  {
         while (data.moveToNext()){
             //get value from db in column 1 (numOfCig) , column 2 (timeStamp)
             //add it to arrayList
-            itemsList.add(new items (data.getString(0), data.getString(1)));
+            itemsList.add(new items (data.getString(0), data.getString(1), data.getString(2)));
         }
 
         myRV.setHasFixedSize(true);

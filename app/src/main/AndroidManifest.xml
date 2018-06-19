@@ -4,7 +4,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/smoking_area"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -20,7 +20,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".lis_view" android:parentActivityName=".MainActivity">
+        <activity android:name=".lis_view" android:parentActivityName=".daysView">
+        </activity>
+        <activity android:name=".daysView" android:parentActivityName=".MainActivity">
         </activity>
     </application>
 

@@ -20,11 +20,13 @@ public class myRVA extends RecyclerView.Adapter<myRVA.viewHolder> {
 
         public TextView numOfCig;
         public TextView timeStamp;
+        public TextView dayDate;
 
         public viewHolder(View itemView) {
             super(itemView);
             numOfCig = itemView.findViewById(R.id.txtCig);
             timeStamp = itemView.findViewById(R.id.txtTimeStamp);
+            dayDate = itemView. findViewById(R.id.txtDayDate);
 
 
         }
@@ -47,6 +49,7 @@ public class myRVA extends RecyclerView.Adapter<myRVA.viewHolder> {
         items currentItem = itemsArray.get(position);
         holder.numOfCig.setText(currentItem.getNumOfCig());
         holder.timeStamp.setText((currentItem.getTimeStamp()));
+        holder.dayDate.setText((currentItem.getDayDate()));
     }
 
 

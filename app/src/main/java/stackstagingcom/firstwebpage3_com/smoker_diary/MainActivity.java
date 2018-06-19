@@ -12,8 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.joda.time.LocalDate;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String cigFirst = "firstCig";
     public static final String lastSmokedCig = "lastSmokedCigLong";
     public static final String dayz = "days";
+    public static final String todayDates = "dateToday";
 
     //LoadData variables
     private String textt;
@@ -37,19 +43,22 @@ public class MainActivity extends AppCompatActivity {
     private String firsttCig;
     private String lastSmokedCigg;
     private String day;
+    private String dates;
 
     //UI components
     Button btnAddSmoked;
     TextView smokedQty;
     TextView smokedSince;
     TextView smokedAverage;
+    TextView txtView;
 
     //Variables
     int average;
     int numberOfCig;
     int firstCig;
     int previousCig;
-    public static int days = 0;
+    public static int days = 3;
+    int dateToday = 0;
 
     String cigTime;
     String dayDate;
@@ -60,14 +69,15 @@ public class MainActivity extends AppCompatActivity {
     long startDateValueLong;
     long lastSmokedCigLong;
 
+    ArrayList<dayDateItems> itemsList;
 
-    SimpleDateFormat date = new SimpleDateFormat("MMM/dd/yy");
+    ArrayList<String> dateName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         myDB = new DatabaseHelper(this);
 
@@ -79,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showListView();
-                /**Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();**/
             }
         });
 
@@ -88,19 +96,21 @@ public class MainActivity extends AppCompatActivity {
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
         smokedAverage = (TextView)findViewById(R.id.smokedAverage);
+        txtView = (TextView)findViewById(R.id.txtView);
 
 
 
         btnAddSmoked.setOnClickListener(new View.OnClickListener () {
             @Override
             public void onClick(View view) {
-                addSmoked();
-                addData(Integer.toString(numberOfCig), cigTime);
+                addSmoked(view);
+                addData(Integer.toString(numberOfCig), cigTime, Integer.toString(days));
             }
         });
 
         loadData();
         updateView();
+        newDay();
     }
 
     protected void onResume () {
@@ -109,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void addData (String newCig, String timeStamp){
-        boolean insertData = myDB.addData(newCig, timeStamp);
+    public void addData (String newCig, String timeStamp, String dateOfDay){
+        boolean insertData = myDB.addData(newCig, timeStamp, dateOfDay);
 
         if (insertData){
             Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
@@ -119,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void addSmoked () {
+    public void addSmoked (View view) {
         numberOfCig = 1 + numberOfCig;
         calcAverage(numberOfCig);
         smokedQty.setText(String.valueOf(numberOfCig));
@@ -130,26 +140,14 @@ public class MainActivity extends AppCompatActivity {
 
         previousCig = numberOfCig;
 
-        Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show();
+        Snackbar.make(view, "Added!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        //Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show();
 
         saveData();
         lastCig();
 
-        Date day = null;
-        try {
-            day = date.parse(dayDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        boolean insertData = myDB.addDate(day.getTime());
 
-        if (insertData){
-            Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Something went wrong /date/",Toast.LENGTH_SHORT).show();
         }
-
-    }
 
     public void calcAverage (int numOfCig) {
         if (days == 0) {
@@ -177,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(cigFirst, Integer.toString(firstCig));
         editor.putString(lastSmokedCig, Long.toString(lastSmokedCigLong));
         editor.putString(dayz, Integer.toString(days));
+        editor.putString(todayDates, Integer.toString(dateToday));
 
         editor.apply();
 
@@ -190,11 +189,13 @@ public class MainActivity extends AppCompatActivity {
         firsttCig = sp.getString(cigFirst , "0");
         lastSmokedCigg = sp.getString(lastSmokedCig, "0");
         day = sp.getString(dayz, "0");
+        dates = sp.getString(todayDates, "0");
 
         numberOfCig = Integer.parseInt(textt);
         firstCig = Integer.parseInt(firsttCig);
         lastSmokedCigLong = Long.parseLong(lastSmokedCigg);
         days = Integer.parseInt(day);
+        dateToday = Integer.parseInt(dates);
     }
 
     public void updateView (){
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         startDateValueLong = startDateValue.getTime();
         startDateValue.setTime(startDateValueLong);
 
-        System.out.print(" firstCig: "+firstCig);
+        System.out.print(" firstCig: "+firstCig+" ");
 
 
         //firstCig is the very first cig in the app,
@@ -275,17 +276,41 @@ public class MainActivity extends AppCompatActivity {
         sdf.setTimeZone(TimeZone.getDefault());
         cigTime = sdf.format(startDate);
 
-
-
-        date.setTimeZone(TimeZone.getDefault());
-        dayDate = date.format(startDate);
-
-
         System.out.printf(
                 "%d days, %d hours, %d minutes, %d seconds%n",
                 elapsedDays,
                 elapsedHours, elapsedMinutes, elapsedSeconds);
 
     }
+
+    public void newDay () {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate tomorrow = currentDate.plusDays(1);
+        String dateString = currentDate.toString("dd/MMM/yyyy");
+        txtView.setText(dateString);
+
+        String tomorrowDate = tomorrow.toString("ddMMyyyy");
+
+        int dateTomorrow = Integer.parseInt(tomorrowDate);
+        dateToday = 0;
+
+
+        //This stmt must run once a day _AlarmManager_ || _SchedulerManager_
+        if ( dateToday == dateTomorrow ) {
+
+            //Add new Item to ListView Array
+            Toast.makeText(this, "new Day", Toast.LENGTH_SHORT).show(); //Test
+
+            dateName.add(dateString);
+            } else {
+
+            Toast.makeText(this, "not yet", Toast.LENGTH_SHORT).show(); //Test
+
+            dateToday = dateTomorrow;
+            ++days;
+            }
+
+            }
+
 
 }

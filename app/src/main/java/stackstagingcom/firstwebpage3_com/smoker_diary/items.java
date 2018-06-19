@@ -8,10 +8,12 @@ public class items {
 
     private String num_of_cig;
     private String timeStamp;
+    private String dayDate;
 
-    public items(String num_of_cig, String timeStamp) {
+    public items(String num_of_cig, String timeStamp, String dayDate) {
         this.num_of_cig = num_of_cig;
         this.timeStamp = timeStamp;
+        this.dayDate = dayDate;
     }
 
 
@@ -21,6 +23,10 @@ public class items {
 
     public String getTimeStamp (){
         return timeStamp;
+    }
+
+    public String getDayDate (){
+        return dayDate;
     }
 
 }
