@@ -1,5 +1,8 @@
 package stackstagingcom.firstwebpage3_com.smoker_diary;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,17 +10,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.joda.time.LocalDate;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
@@ -58,10 +57,9 @@ public class MainActivity extends AppCompatActivity {
     int firstCig;
     int previousCig;
     public static int days = 3;
-    int dateToday = 0;
+    public static int dateToday = 0;
 
     String cigTime;
-    String dayDate;
 
     Date startDateValue = new Date();
     Date endDateValue = new Date();
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<dayDateItems> itemsList;
 
-    ArrayList<String> dateName;
+    public static ArrayList<String> dateName;
 
 
     @Override
@@ -110,12 +108,18 @@ public class MainActivity extends AppCompatActivity {
 
         loadData();
         updateView();
-        newDay();
+        //newDay();
+        scheduleJob();
+        cancelJob();
     }
 
     protected void onResume () {
         super.onResume();
         lastCig();
+    }
+
+    protected void doInBackground(){
+
     }
 
 
@@ -283,7 +287,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
     public void newDay () {
+
+
         LocalDate currentDate = LocalDate.now();
         LocalDate tomorrow = currentDate.plusDays(1);
         String dateString = currentDate.toString("dd/MMM/yyyy");
@@ -310,7 +317,31 @@ public class MainActivity extends AppCompatActivity {
             ++days;
             }
 
+
             }
+     **/
+
+    public void scheduleJob (){
+        ComponentName cn = new ComponentName(this, jobService.class);
+        JobInfo info = new JobInfo.Builder(1, cn).setPersisted(true).setPeriodic(60 * 60 * 1000).build();
+
+        JobScheduler js = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
+        int codeResult = js.schedule(info);
+
+        if (codeResult == JobScheduler.RESULT_SUCCESS){
+            Log.d("jobScheduler", "Job success");
+        } else {
+            Log.d("JobScheduler", "Job failed");
+        }
+    }
+
+    public void cancelJob (){
+        JobScheduler js = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
+        js.cancel(1);
+        Log.d("JobScheduler", "Job canceled");
+    }
 
 
 }
+
+

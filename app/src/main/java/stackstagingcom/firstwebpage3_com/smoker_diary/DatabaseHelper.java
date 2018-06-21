@@ -16,6 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL2 = "numOfCig";
     public static final String COL3 = "timeStamp";
     public static final String COL4 = "dayDate";
+    public static final String COL5 = "dayName";
 
     String date;
 
