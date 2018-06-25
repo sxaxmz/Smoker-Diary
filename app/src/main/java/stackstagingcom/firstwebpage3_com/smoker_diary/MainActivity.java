@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     TextView smokedQty;
     TextView smokedSince;
     TextView smokedAverage;
-    TextView txtView;
+    TextView txtCreator;
 
     //Variables
     int average;
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public static int dateToday = 0;
 
     String cigTime;
+    String dateTxt;
 
     Date startDateValue = new Date();
     Date endDateValue = new Date();
@@ -79,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         myDB = new DatabaseHelper(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,11 +88,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        fab.setImageResource(R.drawable.ic_history);
+
         smokedQty = (TextView)findViewById(R.id.qty1);
         btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
         smokedSince = (TextView)findViewById(R.id.smokedSince);
         smokedAverage = (TextView)findViewById(R.id.smokedAverage);
-        txtView = (TextView)findViewById(R.id.txtView);
+        txtCreator = (TextView)findViewById(R.id.txtCreator);
+
+        txtCreator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, webView.class);
+                startActivity(intent);
+            }
+        });
 
 
 
@@ -102,15 +110,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 addSmoked(view);
-                addData(Integer.toString(numberOfCig), cigTime, Integer.toString(days));
+                //addData(Integer.toString(numberOfCig), cigTime, Integer.toString(days));
+                addData(Integer.toString(numberOfCig), cigTime, dateTxt);
             }
         });
 
         loadData();
         updateView();
-        //newDay();
-        scheduleJob();
-        cancelJob();
+        //scheduleJob();
     }
 
     protected void onResume () {
@@ -118,16 +125,12 @@ public class MainActivity extends AppCompatActivity {
         lastCig();
     }
 
-    protected void doInBackground(){
-
-    }
-
-
     public void addData (String newCig, String timeStamp, String dateOfDay){
         boolean insertData = myDB.addData(newCig, timeStamp, dateOfDay);
 
         if (insertData){
-            Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
+            //Replaced with snackbar
+            //Toast.makeText(this, "Inserted  successfully",Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Something went wrong",Toast.LENGTH_SHORT).show();
         }
@@ -144,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
 
         previousCig = numberOfCig;
 
-        Snackbar.make(view, "Added!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+
         //Toast.makeText(this, "Added!", Toast.LENGTH_SHORT).show();
+        Snackbar.make(view, "Added!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
 
         saveData();
         lastCig();
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showListView () {
-        Intent listView = new Intent(this, lis_view.class);
+        Intent listView = new Intent(MainActivity.this, lis_view.class);
         startActivity(listView);
     }
 
@@ -263,10 +267,10 @@ public class MainActivity extends AppCompatActivity {
 
         long elapsedSeconds = different / secondsInMilli;
 
-        smokedSince.setText(
-                Long.toString(Math.abs(elapsedDays)) +" D " + Long.toString(Math.abs(elapsedHours)) + " H " +
-                        Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S "
-        );
+        timeStamp = Long.toString(Math.abs(elapsedDays)) +" D " + Long.toString(Math.abs(elapsedHours)) + " H " +
+                Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S ";
+
+        smokedSince.setText(timeStamp);
 
         System.out.print("start: "+ startDate);
         System.out.print(" end: "+ endDate);
@@ -279,6 +283,10 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         sdf.setTimeZone(TimeZone.getDefault());
         cigTime = sdf.format(startDate);
+
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MMM/yyyy");
+        sdf2.setTimeZone(TimeZone.getDefault());
+        dateTxt = sdf2.format(startDate);
 
         System.out.printf(
                 "%d days, %d hours, %d minutes, %d seconds%n",
@@ -323,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void scheduleJob (){
         ComponentName cn = new ComponentName(this, jobService.class);
-        JobInfo info = new JobInfo.Builder(1, cn).setPersisted(true).setPeriodic(60 * 60 * 1000).build();
+        JobInfo info = new JobInfo.Builder(1, cn).setPeriodic(60 * 60 * 1000).build();
 
         JobScheduler js = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
         int codeResult = js.schedule(info);
@@ -335,11 +343,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void cancelJob (){
-        JobScheduler js = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
-        js.cancel(1);
-        Log.d("JobScheduler", "Job canceled");
-    }
 
 
 }

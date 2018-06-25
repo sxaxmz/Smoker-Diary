@@ -1,5 +1,5 @@
                                                                       # Smoker-Diary
-
+                             Smoker-Diary is an Android app used to help smokers track their smoking habit on a daily basis.
                                                                       #ExistingCode:
                              Run all the basic functionality for the app(Track cig based on number of smoked cig and timestamp.)
                                                                                                                          
@@ -7,21 +7,18 @@
                                                     UI design -> Days division in List view.
                                                                  Clear main activity data in a new day.
 																                                                     
-                                                        i)ArrayList -> CardView design, divided by days/date 
-                                                         ii)Algo for counting days/date
-                                                         iii)JobService modification & test;
+                                                        i)ArrayList -> CardView design, divided by days/date
+                                                        ii)JobService modification & test
 
                                         /\ create an item for each day based on the MainActivity.days /\
                                         /\ the day's number will be added to local SQlite under COL4 /\
                                         /\ onClickListener for each day in the list will open the numOfCig /\
                                         /\ for that specific day (depending on COL4 value). /\
 													
-										/\ initialize COL5 to contain the day name that will be displayed /\
-										/\ in the list view as days division in daysView layout. /\
-													
-													
-										/\ get the count for number of rows that have the same COL4 value /\
-										/\ base that number to an int to create list of items in list view. /\
+										/\ create function that runs daily to create new listView item. /\
+										/\ the new listView item will be named based on the day that /\
+										/\ it was created on. The new item will have a value to determine /\
+										/\ the new position in the listView for the onClickListener. /\
 													
 													
 													

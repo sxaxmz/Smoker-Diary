@@ -84,7 +84,7 @@ public class jobService extends JobService {
 
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
-        return true;
+        return false;
     }
 
     public void saveData () {

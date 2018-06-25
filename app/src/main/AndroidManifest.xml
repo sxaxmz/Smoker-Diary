@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="stackstagingcom.firstwebpage3_com.smoker_diary">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <application
         android:allowBackup="true"
@@ -22,9 +23,11 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".splash">
+            >
 
+        </activity>
+
+        <activity android:name=".webView" android:parentActivityName=".MainActivity">
         </activity>
 
         <activity android:name=".daysView" android:parentActivityName=".MainActivity">
@@ -33,7 +36,11 @@
         <activity android:name=".lis_view" android:parentActivityName=".daysView">
         </activity>
 
-        <service android:name=".jobService" android:permission="android:permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".jobService"
+            android:permission="android:permission.BIND_JOB_SERVICE"
+            android:exported="false">
+        </service>
 
     </application>
 
