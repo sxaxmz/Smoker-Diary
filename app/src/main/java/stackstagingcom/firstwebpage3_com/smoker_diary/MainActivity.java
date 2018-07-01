@@ -1,10 +1,13 @@
 package stackstagingcom.firstwebpage3_com.smoker_diary;
 
+import android.app.ActionBar;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +22,7 @@ import org.joda.time.LocalDate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String lastSmokedCig = "lastSmokedCigLong";
     public static final String dayz = "days";
     public static final String todayDates = "dateToday";
+    public static final String dateChecker = "checkDate";
 
     //LoadData variables
     private String textt;
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private String lastSmokedCigg;
     private String day;
     private String dates;
+    private String checkerDate;
 
     //UI components
     Button btnAddSmoked;
@@ -56,8 +62,9 @@ public class MainActivity extends AppCompatActivity {
     int numberOfCig;
     int firstCig;
     int previousCig;
-    public static int days = 3;
+    public static int days = 0;
     public static int dateToday = 0;
+    int checkDate;
 
     String cigTime;
     String dateTxt;
@@ -78,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        newDay();
+
         myDB = new DatabaseHelper(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -90,11 +99,14 @@ public class MainActivity extends AppCompatActivity {
 
         fab.setImageResource(R.drawable.ic_history);
 
-        smokedQty = (TextView)findViewById(R.id.qty1);
-        btnAddSmoked = (Button)findViewById(R.id.btnSmoked);
-        smokedSince = (TextView)findViewById(R.id.smokedSince);
-        smokedAverage = (TextView)findViewById(R.id.smokedAverage);
-        txtCreator = (TextView)findViewById(R.id.txtCreator);
+        android.support.v7.app.ActionBar bar =  getSupportActionBar();
+        bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#d2f7242b")));
+
+        smokedQty = (TextView) findViewById(R.id.qty1);
+        btnAddSmoked = (Button) findViewById(R.id.btnSmoked);
+        smokedSince = (TextView) findViewById(R.id.smokedSince);
+        smokedAverage = (TextView) findViewById(R.id.smokedAverage);
+        txtCreator = (TextView) findViewById(R.id.txtCreator);
 
         txtCreator.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-        btnAddSmoked.setOnClickListener(new View.OnClickListener () {
+        btnAddSmoked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addSmoked(view);
@@ -118,12 +129,42 @@ public class MainActivity extends AppCompatActivity {
         loadData();
         updateView();
         //scheduleJob();
-    }
+
+        //Counter modifications update view per second
+        /**
+
+        if (firstCig == 1) {
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        while (!isInterrupted()) {
+                            Thread.sleep(10000);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    lastCig();
+                                }
+                            });
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            thread.start();
+
+        }
+
+         **/
+
+}
 
     protected void onResume () {
         super.onResume();
         lastCig();
     }
+
 
     public void addData (String newCig, String timeStamp, String dateOfDay){
         boolean insertData = myDB.addData(newCig, timeStamp, dateOfDay);
@@ -184,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(lastSmokedCig, Long.toString(lastSmokedCigLong));
         editor.putString(dayz, Integer.toString(days));
         editor.putString(todayDates, Integer.toString(dateToday));
+        editor.putString(dateChecker, Integer.toString(checkDate));
 
         editor.apply();
 
@@ -193,17 +235,19 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         textt = sp.getString(TEXT, "0");
         AverageSmoked = sp.getString(Average, "0");
-        timeStamp = sp.getString(lastSmoked, "-D -H -M -S");
+        timeStamp = sp.getString(lastSmoked, " ");
         firsttCig = sp.getString(cigFirst , "0");
         lastSmokedCigg = sp.getString(lastSmokedCig, "0");
         day = sp.getString(dayz, "0");
         dates = sp.getString(todayDates, "0");
+        checkerDate = sp.getString(dateChecker, "1");
 
         numberOfCig = Integer.parseInt(textt);
         firstCig = Integer.parseInt(firsttCig);
         lastSmokedCigLong = Long.parseLong(lastSmokedCigg);
         days = Integer.parseInt(day);
         dateToday = Integer.parseInt(dates);
+        checkDate = Integer.parseInt(checkerDate);
     }
 
     public void updateView (){
@@ -267,13 +311,28 @@ public class MainActivity extends AppCompatActivity {
 
         long elapsedSeconds = different / secondsInMilli;
 
-        timeStamp = Long.toString(Math.abs(elapsedDays)) +" D " + Long.toString(Math.abs(elapsedHours)) + " H " +
-                Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S ";
+
+        timeStamp = "";
+        if (Math.abs(elapsedDays) > 0) {
+            timeStamp += Long.toString(Math.abs(elapsedDays)) +" D ";
+        }
+        if (Math.abs(elapsedHours) > 0) {
+            timeStamp += Long.toString(Math.abs(elapsedHours)) + " H ";
+        }
+        if (Math.abs(elapsedMinutes) > 0) {
+            timeStamp += Long.toString(Math.abs(elapsedMinutes)) + " M ";
+        }
+        if (Math.abs(elapsedSeconds) > 0) {
+            timeStamp += Long.toString(Math.abs(elapsedSeconds)) + " S ";
+        }
+
+        //timeStamp = Long.toString(Math.abs(elapsedDays)) +" D " + Long.toString(Math.abs(elapsedHours)) + " H " +
+        //       Long.toString(Math.abs(elapsedMinutes)) + " M " + Long.toString(Math.abs(elapsedSeconds)) + " S ";
 
         smokedSince.setText(timeStamp);
 
-        System.out.print("start: "+ startDate);
-        System.out.print(" end: "+ endDate);
+        System.out.print("Start: "+ startDate + " ");
+        System.out.print(" End: "+ endDate + " ");
 
         lastSmokedCigLong = startDate.getTime();
 
@@ -295,21 +354,33 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
+
     public void newDay () {
 
 
         LocalDate currentDate = LocalDate.now();
         LocalDate tomorrow = currentDate.plusDays(1);
-        String dateString = currentDate.toString("dd/MMM/yyyy");
-        txtView.setText(dateString);
+        String dateString = currentDate.toString("ddMMyyyy");
+
+        int todayDate = Integer.parseInt(dateString);
 
         String tomorrowDate = tomorrow.toString("ddMMyyyy");
 
         int dateTomorrow = Integer.parseInt(tomorrowDate);
-        dateToday = 0;
 
+        if (checkDate == 0) {
 
+                ++days;
+                dateToday = todayDate;
+                checkDate = 1;
+
+        } else if (checkDate == 1) {
+            if (dateToday != todayDate) {
+                checkDate = 0;
+            }
+        }
+
+        /**
         //This stmt must run once a day _AlarmManager_ || _SchedulerManager_
         if ( dateToday == dateTomorrow ) {
 
@@ -324,10 +395,9 @@ public class MainActivity extends AppCompatActivity {
             dateToday = dateTomorrow;
             ++days;
             }
-
+         **/
 
             }
-     **/
 
     public void scheduleJob (){
         ComponentName cn = new ComponentName(this, jobService.class);
@@ -342,8 +412,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d("JobScheduler", "Job failed");
         }
     }
-
-
 
 }
 

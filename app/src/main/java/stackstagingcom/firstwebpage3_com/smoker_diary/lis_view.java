@@ -4,6 +4,8 @@ package stackstagingcom.firstwebpage3_com.smoker_diary;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,6 +38,9 @@ public class lis_view extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_view);
+
+        android.support.v7.app.ActionBar bar =  getSupportActionBar();
+        bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#d2f7242b")));
 
 
         myDB = new DatabaseHelper(this);
